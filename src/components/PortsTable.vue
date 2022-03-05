@@ -25,6 +25,60 @@
           </tr>
         </tbody>
       </table>
+      <nav class="pagination" role="navigation" aria-label="pagination">
+        <a :class="['pagination-previous', {'is-disabled': !hasPreviousPage}]">Previous</a>
+        <a :class="['pagination-next', {'is-disabled': !hasNextPage}]">Next page</a>
+        <ul v-if="lastPage <= 7" class="pagination-list">
+          <li v-for="index in lastPage" :key="index">
+            <a :class="['pagination-link', {'is-current': index === currentPage}]">{{index}}</a>
+          </li>
+        </ul>
+        <ul v-else-if="currentPage <= 5" class="pagination-list">
+          <li v-for="index in 5" :key="index">
+            <a :class="['pagination-link', {'is-current': index === currentPage}]">{{index}}</a>
+          </li>
+          <li>
+            <span class="pagination-ellipsis">&hellip;</span>
+          </li>
+          <li>
+            <a class="pagination-link">{{lastPage}}</a>
+          </li>
+        </ul>
+        <ul v-else-if="currentPage >= (lastPage - 4)" class="pagination-list">
+          <li>
+            <a class="pagination-link">1</a>
+          </li>
+          <li>
+            <span class="pagination-ellipsis">&hellip;</span>
+          </li>
+          <li v-for="index in lastFivePages()" :key="index">
+            <a :class="['pagination-link', {'is-current': index === currentPage}]">{{index}}</a>
+          </li>
+        </ul>
+        <ul v-else class="pagination-list">
+          <li>
+            <a class="pagination-link">1</a>
+          </li>
+          <li>
+            <span class="pagination-ellipsis">&hellip;</span>
+          </li>
+          <li>
+            <a class="pagination-link">{{currentPage - 1}}</a>
+          </li>
+          <li>
+            <a class="pagination-link is-current">{{currentPage}}</a>
+          </li>
+          <li>
+            <a class="pagination-link">{{currentPage + 1}}</a>
+          </li>
+          <li>
+            <span class="pagination-ellipsis">&hellip;</span>
+          </li>
+          <li>
+            <a class="pagination-link">{{lastPage}}</a>
+          </li>
+        </ul>
+      </nav>
     </div>
   </div>
 </template>
@@ -36,13 +90,23 @@ export default {
   data () {
     return  {
       ports: undefined,
+      columnHeaders: ["ID", "Name", "Country", "Continent", "Coordinates"],
+      currentPage: undefined,
+      lastPage: undefined,
       loading: true,
-      error: false,
-      columnHeaders: ["ID", "Name", "Country", "Continent", "Coordinates"]
+      error: false
     };
   },
   mounted() {
     this.fetchPorts();
+  },
+  computed: {
+    hasNextPage: function() {
+      return this.currentPage !== this.lastPage;
+    },
+    hasPreviousPage: function() {
+      return this.currentPage !== 1;
+    }
   },
   methods: {
     async fetchPorts() {
@@ -52,10 +116,32 @@ export default {
 
         this.ports = parsedResponse.data;
         this.loading = false;
+        
+        const { current_page: responseCurrentPage, last_page: responseLastPage } = parsedResponse.meta;
+        this.updatePagination(responseCurrentPage, responseLastPage);
+
+        console.log(parsedResponse);
+        console.log(this.currentPage);
+        console.log(this.lastPage);
+        console.log(this.previousPage);
+        console.log(this.nextPage);
+        this.lastFivePages()
       } catch {
         this.error = true;
         this.loading = false;
       }
+    },
+    updatePagination(currentPage, lastPage) {
+      if (this.currentPage === undefined || this.currentPage === currentPage) {
+        this.currentPage = currentPage;
+      }
+      if (this.lastPage === undefined || this.lastPage === lastPage) {
+        this.lastPage = lastPage;
+      }
+    }, 
+    lastFivePages() {
+      let start = this.lastPage-4;
+      return Array(this.lastPage - start + 1).fill().map((_, idx) => start + idx)
     }
   }
 }

@@ -1,3 +1,7 @@
+table {
+  line-height: 1;
+}
+
 $table-head-cell-color: blue;
 
 @import "./node_modules/bulma/sass/elements/table.sass";
