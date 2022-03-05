@@ -1,5 +1,21 @@
+.card {
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin: auto;
+  width: fit-content;
+}
+
+.sticky {
+  position: sticky;
+}
+
 table {
   line-height: 1;
+}
+
+tbody td{
+  font-size: .85em;
 }
 
 $table-head-cell-color: blue;

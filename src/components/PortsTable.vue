@@ -1,18 +1,24 @@
 <template>
-  <div>
-    <div v-if="!loading">
+  <div class="container">
+    <div class="card">
+      <header class="card-header sticky" id="header">
+        <div class="card-header-title has-background-primary-dark has-text-white">
+          Ports
+        </div>
+      </header>
       <table class="table is-striped is-bordered">
         <thead>
           <tr>
-            <th 
+            <th
               v-for="(header, index) in columnHeaders"
-              :key="index"  
+              :key="index"
+              class="th-column sticky has-background-primary-light"
             >
               {{header}}
             </th>
           </tr>
         </thead>
-        <tbody>
+        <tbody v-if="!loading">
           <tr
             v-for="port in ports"
             :key="port.id"
@@ -25,7 +31,7 @@
           </tr>
         </tbody>
       </table>
-      <nav class="pagination" role="navigation" aria-label="pagination">
+      <nav class="pagination sticky has-background-primary-light" role="navigation" id="pagination">
         <a :class="['pagination-previous', {'is-disabled': !hasPreviousPage}]">Previous</a>
         <a :class="['pagination-next', {'is-disabled': !hasNextPage}]">Next page</a>
         <ul v-if="lastPage <= 7" class="pagination-list">
@@ -51,7 +57,7 @@
           <li>
             <span class="pagination-ellipsis">&hellip;</span>
           </li>
-          <li v-for="index in lastFivePages()" :key="index">
+          <li v-for="index in lastFivePages" :key="index">
             <a :class="['pagination-link', {'is-current': index === currentPage}]">{{index}}</a>
           </li>
         </ul>
@@ -106,6 +112,11 @@ export default {
     },
     hasPreviousPage: function() {
       return this.currentPage !== 1;
+    },
+    lastFivePages: function() {
+      const start = this.lastPage-4;
+      const stop = this.lastPage;
+      return Array(stop - start + 1).fill().map((_, idx) => start + idx);
     }
   },
   methods: {
@@ -119,13 +130,8 @@ export default {
         
         const { current_page: responseCurrentPage, last_page: responseLastPage } = parsedResponse.meta;
         this.updatePagination(responseCurrentPage, responseLastPage);
-
-        console.log(parsedResponse);
-        console.log(this.currentPage);
-        console.log(this.lastPage);
-        console.log(this.previousPage);
-        console.log(this.nextPage);
-        this.lastFivePages()
+    
+        this.setStickyElementsPosition();
       } catch {
         this.error = true;
         this.loading = false;
@@ -138,10 +144,15 @@ export default {
       if (this.lastPage === undefined || this.lastPage === lastPage) {
         this.lastPage = lastPage;
       }
-    }, 
-    lastFivePages() {
-      let start = this.lastPage-4;
-      return Array(this.lastPage - start + 1).fill().map((_, idx) => start + idx)
+    },
+    setStickyElementsPosition() {
+      const header = document.querySelector("#header");
+      const tableHeaderColumns = document.querySelectorAll(".th-column");
+      const pagination = document.querySelector("#pagination");
+
+      header.style.top = 0;
+      [...tableHeaderColumns].forEach( column => column.style.top = `${header.offsetHeight - 1}px`);
+      pagination.style.bottom = 0;
     }
   }
 }
