@@ -39,13 +39,25 @@
               :key="index"
               class="th-column sticky has-background-primary-light"
             >
-              {{header}}
+              <div v-if="isSortable(header)">
+                <div class="is-size-6" @click="sortBy(header)">
+                  {{header}}
+                  <span class="tag is-rounded icon is-small has-text-dark">
+                    <i class="fas fa-arrow-down" aria-hidden="true"></i>
+                  </span>
+                </div>
+              </div>
+              <div v-else>
+                <div class="is-size-6">
+                  {{header}}
+                </div>
+              </div>
             </th>
           </tr>
         </thead>
         <tbody v-if="!loading">
           <tr
-            v-for="port in filteredPorts"
+            v-for="port in sortedPorts"
             :key="port.id"
           >
             <td v-html="highlightMatches(port.id)"></td>
@@ -123,6 +135,9 @@ export default {
       ports: undefined,
       filter: '',
       columnHeaders: ["ID", "Name", "Country", "Continent", "Coordinates"],
+      unsortableColumns: ["Coordinates"],
+      currentSort: '',
+      currentSortDirection: 'asc',
       currentPage: undefined,
       lastPage: undefined,
       loading: true,
@@ -146,6 +161,17 @@ export default {
     },
     filteredPorts: function() {
       return this.ports.filter(port => this.containsSearch(this.filter, port));
+    },
+    sortedPorts: function() {
+      if(this.currentSort === "") return this.filteredPorts;
+
+      return [...this.filteredPorts].sort((a, b) => {
+        let modifier = 1;
+        if(this.currentSortDirection === 'desc') modifier = -1;
+        if(a[this.currentSort] < b[this.currentSort]) return -1 * modifier;
+        if(a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
+        return 0;
+      });
     }
   },
   methods: {
@@ -203,6 +229,19 @@ export default {
 
       const regex = new RegExp(this.filter, 'ig');
       return text.replace(regex, matchedText => `<strong>${matchedText}</strong>`)
+    },
+    sortBy(column) {
+      column = column.toLowerCase();
+
+      if (column === this.currentSort) {
+        this.currentSortDirection =
+          this.currentSortDirection === 'asc'? 'desc' : 'asc';
+      }
+
+      this.currentSort = column;
+    },
+    isSortable(column) {
+      return this.unsortableColumns.indexOf(column) === -1;
     }
   }
 }
