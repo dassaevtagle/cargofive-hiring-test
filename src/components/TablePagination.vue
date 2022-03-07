@@ -1,11 +1,17 @@
 <template>
   <nav v-if="!loadingFirstTime" class="pagination is-right sticky has-background-primary-light mb-0 p-2" role="navigation" id="pagination">
-    <a :class="['pagination-previous pagination-arrow', {'is-disabled': !hasPreviousPage}]" @click="goTo(currentPage-1)">
+    <a
+      v-if="!isMobile"
+      :class="['pagination-previous pagination-arrow', {'is-disabled': !hasPreviousPage}]" 
+      @click="goTo(currentPage-1)">
       <span class="is-rounded icon is-small has-text-dark">
         <i class="fas fa-angle-left" aria-hidden="true"></i>
       </span>
     </a>
-    <a :class="['pagination-next pagination-arrow', {'is-disabled': !hasNextPage}]" @click="goTo(currentPage+1)">
+    <a 
+      v-if="!isMobile"
+      :class="['pagination-next pagination-arrow', {'is-disabled': !hasNextPage}]" 
+      @click="goTo(currentPage+1)">
       <span class="is-rounded icon is-small has-text-dark">
         <i class="fas fa-angle-right" aria-hidden="true"></i>
       </span>
@@ -63,10 +69,11 @@
         <a class="pagination-link" @click="goTo(lastPage)">{{lastPage}}</a>
       </li>
     </ul>
+    <slot name="sort-dropdown"></slot>
   </nav>
   <nav v-else class="pagination is-right sticky has-background-primary-light mb-0 p-2" id="pagination">
-    <a class="pagination-link skeleton"><div></div></a>
-    <a class="pagination-link skeleton"><div></div></a>
+    <a v-if="!isMobile" class="pagination-link skeleton"><div></div></a>
+    <a v-if="!isMobile" class="pagination-link skeleton"><div></div></a>
     <ul class="pagination-list">
       <li v-for="index in 7" :key="index">
         <a class="pagination-link skeleton"><div></div></a>
@@ -81,11 +88,13 @@ export default {
     return {
       currentPage: 0,
       lastPage: 0,
-      loadingFirstTime: true
+      loadingFirstTime: true,
+      isMobile: undefined
     };
   },
   created() {
     this.setListeners();
+    this.getDeviceWidth();
   },
   computed: {
     hasNextPage: function() {
@@ -109,8 +118,13 @@ export default {
       this.currentPage = page;
       this.lastPage = lastPage;
     },
+    getDeviceWidth() {
+      const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      this.isMobile = width < 770;
+    },
     setListeners() {
       this.$parent.$on('loading-first-time', value => this.loadingFirstTime = value);
+      window.addEventListener('resize', () => this.getDeviceWidth());
     }
   }
 }
@@ -147,6 +161,7 @@ export default {
   opacity: 0.7;
   &:hover{
     cursor: default;
+    background-color:#bfbebe;
   }
 }
 

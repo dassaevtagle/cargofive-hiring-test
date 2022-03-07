@@ -2,34 +2,34 @@
   <div class="container">
     <div class="card">
       <header class="card-header sticky" id="header">
-        <div class="card-header-title level has-background-info has-text-white">
+        <div class="level has-background-info has-text-white px-5 py-3">
           <div class="level-left">
             <div class="level-item">
               <div v-if="loading" class="spinner mr-3"></div>
-              <h1>Ports</h1>
+              <h1 class="mr-auto is-size-5">Ports</h1>
+              <span v-if="isMobile" class="ml-auto icon" @click="toggleSearchBar">
+                  <i class="fas fa-search" aria-hidden="true"></i>
+              </span>
             </div>
           </div>
-          <div class="level-right">
+          <div class="level-right" v-if="!hideSearchBar">
             <div class="level-item">
-              <div class="field has-addons">
+              <button v-if="isMobile" class="button" @click="resetFilters">
+                Reset filters
+              </button>
+              &nbsp;
+              <div class="field">
                 <p class="control">
                   <input 
                     class="input" 
                     id="search" 
                     type="text" 
-                    placeholder="Find in page"
+                    placeholder="Search"
                     v-model="filter">
-                </p>
-                <p class="control">
-                  <button class="button">
-                    <span class="icon has-text-dark">
-                      <i class="fas fa-search" aria-hidden="true"></i>
-                    </span>
-                  </button>
                 </p>
               </div>
             </div>
-            <div class="level-item">
+            <div v-if="!isMobile" class="level-item">
               <button class="button" @click="resetFilters">
                 Reset filters
               </button>
@@ -40,7 +40,32 @@
       <Pagination
         @goto="fetchPorts"
         ref="pagination"
-      />
+      >
+        <template v-if="isMobile" #sort-dropdown>
+          <div class="dropdown ml-3 is-right" id="sort-dropdown" @click="toggleSortDropdown">
+            <div class="dropdown-trigger">
+              <button class="button" id="sort-dropdown-button" aria-haspopup="true" aria-controls="dropdown-menu">
+                <span>Sort</span>
+                <span class="icon is-small">
+                  <i class="fas fa-angle-down" aria-hidden="true"></i>
+                </span>
+              </button>
+            </div>
+            <div class="dropdown-menu" id="dropdown-menu" role="menu">
+              <div class="dropdown-content">
+                <a 
+                  v-for="(header, index) in columnHeaders"
+                  :key="index" 
+                  class="dropdown-item">
+                    <p v-if="isSortable(header)" @click="sortBy(header);">
+                      {{header}}
+                    </p>
+                </a>
+              </div>
+            </div>
+          </div>
+        </template>
+      </Pagination>
       <table v-if="!loadingFirstTime" class="table is-striped is-narrow is-hoverable">
         <thead>
           <tr>
@@ -50,15 +75,15 @@
               class="th-column sticky has-background-primary-light"
             >
               <div v-if="isSortable(header)">
-                <div class="is-size-6 sortable" @click="sortBy(header)">
+                <div class="is-size-7-mobile is-size-6-desktop sortable" @click="sortBy(header)">
                   {{header}}
-                  <span class="tag is-rounded icon is-small has-text-dark">
+                  <span v-if="!isMobile" class="tag is-rounded icon is-small has-text-dark">
                     <i class="fas fa-arrow-down" aria-hidden="true"></i>
                   </span>
                 </div>
               </div>
               <div v-else>
-                <div class="is-size-6">
+                <div class="is-size-7-mobile is-size-6-desktop">
                   {{header}}
                 </div>
               </div>
@@ -110,8 +135,10 @@ export default {
       currentSort: '',
       currentSortDirection: 'asc',
       currentPage: undefined,
+      switchSearchBar: true,
       lastPage: undefined,
       loading: true,
+      isMobile: undefined,
       loadingFirstTime: true,
       error: false
     };
@@ -120,6 +147,7 @@ export default {
     Pagination: Pagination
   },
   mounted() {
+    this.getDeviceWith();
     this.fetchPorts();
     this.setListeners();
   },
@@ -137,6 +165,9 @@ export default {
         if(a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
         return 0;
       });
+    },
+    hideSearchBar: function() {
+      return this.isMobile && this.switchSearchBar;
     }
   },
   methods: {
@@ -231,8 +262,22 @@ export default {
       this.currentSort = '';
       this.currentSortDirection = 'asc';
     },
+    getDeviceWith() {
+      const width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+      this.isMobile = width < 770;
+    },
     setListeners() {
-      window.onresize(() => this.setStickyElementsPosition());
+      window.addEventListener('resize', () => {
+        this.getDeviceWith();
+        this.setStickyElementsPosition();
+      });
+    },
+    toggleSortDropdown() {
+      const dropwdownClassList = document.querySelector("#sort-dropdown").classList;
+      dropwdownClassList.toggle("is-active");
+    },
+    toggleSearchBar() {
+      this.switchSearchBar = !this.switchSearchBar;
     }
   }
 }

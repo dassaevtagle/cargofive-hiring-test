@@ -13,6 +13,9 @@ $family-primary: $family-sans-serif;
 $primary: #549F93;
 $info: #258EA6;
 
+.sticky {
+  position: sticky;
+}
 
 .spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);
