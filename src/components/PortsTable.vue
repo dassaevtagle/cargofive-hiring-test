@@ -10,25 +10,30 @@
           </div>
           <div class="level-right">
             <div class="level-item">
-            <div class="field has-addons">
-              <p class="control">
-                <input 
-                  class="input" 
-                  id="search" 
-                  type="text" 
-                  placeholder="Find in page"
-                  v-model="filter">
-              </p>
-              <p class="control">
-                <button class="button">
-                  <span class="icon has-text-dark">
-                    <i class="fas fa-search" aria-hidden="true"></i>
-                  </span>
-                </button>
-              </p>
+              <div class="field has-addons">
+                <p class="control">
+                  <input 
+                    class="input" 
+                    id="search" 
+                    type="text" 
+                    placeholder="Find in page"
+                    v-model="filter">
+                </p>
+                <p class="control">
+                  <button class="button">
+                    <span class="icon has-text-dark">
+                      <i class="fas fa-search" aria-hidden="true"></i>
+                    </span>
+                  </button>
+                </p>
+              </div>
+            </div>
+            <div class="level-item">
+              <button class="button" @click="resetFilters">
+                Reset filters
+              </button>
             </div>
           </div>
-        </div>
         </div>
       </header>
       <table class="table is-striped is-narrow is-hoverable">
@@ -191,6 +196,11 @@ export default {
     toggleLoading(value) {
       this.loading = value;
       this.$emit("loading", value);
+    },
+    resetFilters() {
+      this.filter = "";
+      this.currentSort = '';
+      this.currentSortDirection = 'asc';
     }
   }
 }
