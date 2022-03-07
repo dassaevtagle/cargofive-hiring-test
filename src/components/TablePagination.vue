@@ -1,7 +1,15 @@
 <template>
-  <nav v-if="!loadingFirstTime" class="pagination is-right sticky has-background-primary-light mb-0" role="navigation" id="pagination">
-    <a :class="['pagination-previous', {'is-disabled': !hasPreviousPage}]" @click="goTo(currentPage-1)">Previous</a>
-    <a :class="['pagination-next', {'is-disabled': !hasNextPage}]" @click="goTo(currentPage+1)">Next page</a>
+  <nav v-if="!loadingFirstTime" class="pagination is-right sticky has-background-primary-light mb-0 p-2" role="navigation" id="pagination">
+    <a :class="['pagination-previous pagination-arrow', {'is-disabled': !hasPreviousPage}]" @click="goTo(currentPage-1)">
+      <span class="is-rounded icon is-small has-text-dark">
+        <i class="fas fa-angle-left" aria-hidden="true"></i>
+      </span>
+    </a>
+    <a :class="['pagination-next pagination-arrow', {'is-disabled': !hasNextPage}]" @click="goTo(currentPage+1)">
+      <span class="is-rounded icon is-small has-text-dark">
+        <i class="fas fa-angle-right" aria-hidden="true"></i>
+      </span>
+    </a>
     <ul v-if="lastPage <= 7" class="pagination-list">
       <li v-for="index in lastPage" :key="index">
         <a 
@@ -56,7 +64,7 @@
       </li>
     </ul>
   </nav>
-  <nav v-else class="pagination is-right sticky has-background-primary-light mb-0" id="pagination">
+  <nav v-else class="pagination is-right sticky has-background-primary-light mb-0 p-2" id="pagination">
     <a class="pagination-link skeleton"><div></div></a>
     <a class="pagination-link skeleton"><div></div></a>
     <ul class="pagination-list">
@@ -117,5 +125,36 @@ export default {
 }
 .skeleton.pagination-link {
   border: none;
+}
+
+.pagination-link.is-current {
+  background-color: #549f936b;
+  border: none;
+  color: black;
+}
+.pagination-link{
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  &:hover{
+    background-color: #549f9338;
+    border: none;
+  }
+}
+
+.is-disabled{
+  background-color:#bfbebe;
+  opacity: 0.7;
+  &:hover{
+    cursor: default;
+  }
+}
+
+.pagination-arrow{
+  border-radius: 20px;
+  &:hover{
+    background-color: #549f9338;
+    border: none;
+  } 
 }
 </style>

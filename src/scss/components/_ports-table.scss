@@ -8,6 +8,10 @@ tbody td{
   overflow-x: hidden;
   margin: auto;
   width: fit-content;
+
+  @media (min-width: 890px) {
+    min-width: 900px;
+  }
 }
 
 #header {
@@ -32,6 +36,18 @@ tbody td{
   }
 }
 
+.sortable{
+  &:hover{
+    cursor:pointer;
+  }
+  & span svg{
+    height: 11px;
+    &:hover{
+      transform: scale(1.2);
+    }
+  }
+}
+
 .sticky {
   position: sticky;
 }
@@ -41,6 +57,5 @@ tbody td{
   max-height: var(--table-height);
 }
 
-$table-head-cell-color: blue;
 
 @import "./node_modules/bulma/sass/elements/table.sass";

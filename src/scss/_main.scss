@@ -4,10 +4,15 @@
 
 :root{
   --table-height: 96vh;
+  background-color: #549F93;
 }
 
 $family-sans-serif: 'Inter', sans-serif;
 $family-primary: $family-sans-serif;
+
+$primary: #549F93;
+$info: #258EA6;
+
 
 .spinner {
   border: 4px solid rgba(0, 0, 0, 0.1);

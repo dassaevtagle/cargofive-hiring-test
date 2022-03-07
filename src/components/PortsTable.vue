@@ -2,7 +2,7 @@
   <div class="container">
     <div class="card">
       <header class="card-header sticky" id="header">
-        <div class="card-header-title level has-background-primary-dark has-text-white">
+        <div class="card-header-title level has-background-info has-text-white">
           <div class="level-left">
             <div class="level-item">
               <div v-if="loading" class="spinner mr-3"></div>
@@ -50,7 +50,7 @@
               class="th-column sticky has-background-primary-light"
             >
               <div v-if="isSortable(header)">
-                <div class="is-size-6" @click="sortBy(header)">
+                <div class="is-size-6 sortable" @click="sortBy(header)">
                   {{header}}
                   <span class="tag is-rounded icon is-small has-text-dark">
                     <i class="fas fa-arrow-down" aria-hidden="true"></i>
@@ -121,6 +121,7 @@ export default {
   },
   mounted() {
     this.fetchPorts();
+    this.setListeners();
   },
   computed: {
     filteredPorts: function() {
@@ -174,7 +175,7 @@ export default {
       const tableHeaderColumns = document.querySelectorAll(".th-column");
 
       pagination.style.top = `${header.offsetHeight - 1}px`;
-      [...tableHeaderColumns].forEach(column => column.style.top = `${pagination.offsetHeight + header.offsetHeight - 1}px`);
+      [...tableHeaderColumns].forEach(column => column.style.top = `${pagination.clientHeight + header.clientHeight - 1}px`);
     },
     containsSearch(searchValue, port) {
       let normalizedValue = searchValue.toLowerCase();
@@ -229,6 +230,9 @@ export default {
       this.filter = "";
       this.currentSort = '';
       this.currentSortDirection = 'asc';
+    },
+    setListeners() {
+      window.onresize(() => this.setStickyElementsPosition());
     }
   }
 }
