@@ -12,9 +12,9 @@
               </span>
             </div>
           </div>
-          <div class="level-right" v-if="!hideSearchBar">
+          <div v-if="isMobile && !hideSearchBar" class="level-right sticky" id="searchBar">
             <div class="level-item">
-              <button v-if="isMobile" class="button" @click="resetFilters">
+              <button class="button" @click="resetFilters">
                 Reset filters
               </button>
               &nbsp;
@@ -29,7 +29,21 @@
                 </p>
               </div>
             </div>
-            <div v-if="!isMobile" class="level-item">
+          </div>
+          <div v-else-if="!isMobile" class="level-right sticky" id="searchBar">
+            <div class="level-item">
+              <div class="field">
+                <p class="control">
+                  <input 
+                    class="input" 
+                    id="search" 
+                    type="text" 
+                    placeholder="Search"
+                    v-model="filter">
+                </p>
+              </div>
+            </div>
+            <div class="level-item">
               <button class="button" @click="resetFilters">
                 Reset filters
               </button>
@@ -135,7 +149,7 @@ export default {
       currentSort: '',
       currentSortDirection: 'asc',
       currentPage: undefined,
-      switchSearchBar: true,
+      hideSearchBar: true,
       lastPage: undefined,
       loading: true,
       isMobile: undefined,
@@ -165,9 +179,6 @@ export default {
         if(a[this.currentSort] > b[this.currentSort]) return 1 * modifier;
         return 0;
       });
-    },
-    hideSearchBar: function() {
-      return this.isMobile && this.switchSearchBar;
     }
   },
   methods: {
@@ -204,6 +215,14 @@ export default {
       const header = document.querySelector("#header");
       const pagination = document.querySelector("#pagination");
       const tableHeaderColumns = document.querySelectorAll(".th-column");
+
+      if(!this.hideSearchBar) {
+        const searchBar = document.querySelector("#searchBar");
+        searchBar.style.top = `0px`;
+        pagination.style.top = `${header.clientHeight - 1}px`;
+        [...tableHeaderColumns].forEach(column => column.style.top = `${pagination.clientHeight + header.clientHeight - 1}px`);
+        return "";
+      }
 
       pagination.style.top = `${header.offsetHeight - 1}px`;
       [...tableHeaderColumns].forEach(column => column.style.top = `${pagination.clientHeight + header.clientHeight - 1}px`);
@@ -269,6 +288,7 @@ export default {
     setListeners() {
       window.addEventListener('resize', () => {
         this.getDeviceWith();
+        this.hideSearchBar = true;
         this.setStickyElementsPosition();
       });
     },
@@ -277,7 +297,8 @@ export default {
       dropwdownClassList.toggle("is-active");
     },
     toggleSearchBar() {
-      this.switchSearchBar = !this.switchSearchBar;
+      this.hideSearchBar = !this.hideSearchBar;
+      this.$nextTick(() => this.setStickyElementsPosition());
     }
   }
 }
