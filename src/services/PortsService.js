@@ -7,7 +7,7 @@ class Service {
     })
   }
 
-  getPorts(page = 1) {
+  getPorts(page) {
     const url = `/ports?page=${page}`;
 
     return this.client.get(url);
