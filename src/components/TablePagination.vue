@@ -1,5 +1,5 @@
 <template>
-  <nav v-if="!loading" class="pagination is-right sticky has-background-primary-light" role="navigation" id="pagination">
+  <nav v-if="!loadingFirstTime" class="pagination is-right sticky has-background-primary-light mb-0" role="navigation" id="pagination">
     <a :class="['pagination-previous', {'is-disabled': !hasPreviousPage}]" @click="goTo(currentPage-1)">Previous</a>
     <a :class="['pagination-next', {'is-disabled': !hasNextPage}]" @click="goTo(currentPage+1)">Next page</a>
     <ul v-if="lastPage <= 7" class="pagination-list">
@@ -21,7 +21,7 @@
         <a class="pagination-link" @click="goTo(lastPage)">{{lastPage}}</a>
       </li>
     </ul>
-    <ul v-else-if="currentPage >= (lastPage - 4)" class="pagination-list">
+    <ul v-else-if="currentPage > (lastPage - 4)" class="pagination-list">
       <li>
         <a class="pagination-link" @click="goTo(1)">1</a>
       </li>
@@ -56,24 +56,24 @@
       </li>
     </ul>
   </nav>
+  <nav v-else class="pagination is-right sticky has-background-primary-light mb-0" id="pagination">
+    <a class="pagination-link skeleton"><div></div></a>
+    <a class="pagination-link skeleton"><div></div></a>
+    <ul class="pagination-list">
+      <li v-for="index in 7" :key="index">
+        <a class="pagination-link skeleton"><div></div></a>
+      </li>
+    </ul>
+  </nav>
 </template>
 
 <script>
 export default {
   data() {
     return {
-      currentPage: {
-        type: Number,
-        default: 0
-      },
-      lastPage: {
-        type: Number,
-        default: 0
-      },
-      loading: {
-        type: Boolean,
-        default: true
-      }
+      currentPage: 0,
+      lastPage: 0,
+      loadingFirstTime: true
     };
   },
   created() {
@@ -102,8 +102,20 @@ export default {
       this.lastPage = lastPage;
     },
     setListeners() {
-      this.$parent.$on('loading', value => this.loading = value);
+      this.$parent.$on('loading-first-time', value => this.loadingFirstTime = value);
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.skeleton div{
+  background-color: #e7e7e7;
+  border-radius: 20px;
+  height: 15px;
+  width: 15px;
+}
+.skeleton.pagination-link {
+  border: none;
+}
+</style>

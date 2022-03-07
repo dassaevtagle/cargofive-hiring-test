@@ -2,8 +2,44 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300&display=swap');
 
+:root{
+  --table-height: 96vh;
+}
+
 $family-sans-serif: 'Inter', sans-serif;
 $family-primary: $family-sans-serif;
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border-left-color: #fff;
+
+  animation: spin 1s ease infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.skeleton div{
+  background-color: #e7e7e7;
+  animation: loading .5s infinite alternate;
+  width: 80%;
+  border-radius: 10px;
+}
+
+@keyframes loading {
+  from {background-color:#e4e4e4;}
+  to {background-color: hsl(0, 0%, 77%);}
+}
 
 @import "./node_modules/bulma/sass/utilities/_all.sass";
 @import "./node_modules/bulma/sass/base/_all.sass";

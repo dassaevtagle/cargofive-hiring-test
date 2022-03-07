@@ -1,25 +1,44 @@
+tbody td{
+  font-size: .85em;
+}
+
 .card {
-  max-height: 600px;
+  height: var(--table-height);
   overflow-y: auto;
   overflow-x: hidden;
   margin: auto;
   width: fit-content;
 }
 
-.sticky {
-  position: sticky;
-}
-
-#pagination {
-  bottom: 0;
-}
-
 #header {
   top: 0;
 }
 
-tbody td{
-  font-size: .85em;
+.loading-row{
+  &-id{
+    width: 55px;
+  }
+  &-name{
+    width: 288px;
+  }
+  &-country{
+    width: 148px;
+  }
+  &-continent{
+    width: 120px;
+  }
+  &-coordinates{
+    width: 158px;
+  }
+}
+
+.sticky {
+  position: sticky;
+}
+
+.table{
+  min-width: 100%;
+  max-height: var(--table-height);
 }
 
 $table-head-cell-color: blue;

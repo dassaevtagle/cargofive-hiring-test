@@ -5,6 +5,7 @@
         <div class="card-header-title level has-background-primary-dark has-text-white">
           <div class="level-left">
             <div class="level-item">
+              <div v-if="loading" class="spinner mr-3"></div>
               <h1>Ports</h1>
             </div>
           </div>
@@ -36,7 +37,11 @@
           </div>
         </div>
       </header>
-      <table class="table is-striped is-narrow is-hoverable">
+      <Pagination
+        @goto="fetchPorts"
+        ref="pagination"
+      />
+      <table v-if="!loadingFirstTime" class="table is-striped is-narrow is-hoverable">
         <thead>
           <tr>
             <th
@@ -60,7 +65,7 @@
             </th>
           </tr>
         </thead>
-        <tbody v-if="!loading">
+        <tbody>
           <tr
             v-for="port in sortedPorts"
             :key="port.id"
@@ -73,10 +78,20 @@
           </tr>
         </tbody>
       </table>
-      <Pagination
-        @goto="fetchPorts"
-        ref="pagination"
-      />
+      <table v-else class="table is-striped is-narrow">
+        <tbody>
+          <tr 
+            v-for="index in 18"
+            :key="index"
+          >
+            <td class="skeleton loading-row-id"><div>&nbsp;</div></td>
+            <td class="skeleton loading-row-name"><div>&nbsp;</div></td>
+            <td class="skeleton loading-row-country"><div>&nbsp;</div></td>
+            <td class="skeleton loading-row-continent"><div>&nbsp;</div></td>
+            <td class="skeleton loading-row-coordinates"><div>&nbsp;</div></td>
+          </tr>
+        </tbody>  
+      </table>
     </div>
   </div>
 </template>
@@ -97,6 +112,7 @@ export default {
       currentPage: undefined,
       lastPage: undefined,
       loading: true,
+      loadingFirstTime: true,
       error: false
     };
   },
@@ -133,11 +149,10 @@ export default {
         this.ports = parsedResponse.data;
         this.toggleLoading(false);
 
-        
         const { current_page: responseCurrentPage, last_page: responseLastPage } = parsedResponse.meta;
         this.updatePagination(responseCurrentPage, responseLastPage);
 
-        this.setStickyElementsPosition();
+        this.$nextTick(() => this.setStickyElementsPosition());
       } catch {
         this.error = true;
         this.toggleLoading(false);
@@ -155,9 +170,11 @@ export default {
     },
     setStickyElementsPosition() {
       const header = document.querySelector("#header");
+      const pagination = document.querySelector("#pagination");
       const tableHeaderColumns = document.querySelectorAll(".th-column");
 
-      [...tableHeaderColumns].forEach(column => column.style.top = `${header.offsetHeight - 1}px`);
+      pagination.style.top = `${header.offsetHeight - 1}px`;
+      [...tableHeaderColumns].forEach(column => column.style.top = `${pagination.offsetHeight + header.offsetHeight - 1}px`);
     },
     containsSearch(searchValue, port) {
       let normalizedValue = searchValue.toLowerCase();
@@ -194,6 +211,17 @@ export default {
       return this.unsortableColumns.indexOf(column) === -1;
     },
     toggleLoading(value) {
+      if(this.currentPage === undefined && this.lastPage === undefined & !!value){
+        this.$emit("loading-first-time", value);
+        this.loadingFirstTime = value;
+      }
+
+      let notLoadingAndNoError = !value && this.error !== true;
+      if(notLoadingAndNoError) {
+        this.loadingFirstTime = false;
+        this.$emit("loading-first-time", false);
+      }
+
       this.loading = value;
       this.$emit("loading", value);
     },
